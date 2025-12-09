@@ -1,30 +1,58 @@
 {
   "expo": {
-    "name": "ChronoscapeApp",
-    "slug": "ChronoscapeApp",
+    "name": "Chronoscape",
+    "slug": "chronoscape-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "jsEngine": "hermes",
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#1a1a2e"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.chronoscape.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Chronoscape needs camera access to show historical and future reconstructions.",
+        "NSPhotoLibraryUsageDescription": "Chronoscape needs photo library access to analyze and transform your images.",
+        "NSPhotoLibraryAddUsageDescription": "Chronoscape needs permission to save generated images to your photo library.",
+        "NSLocationWhenInUseUsageDescription": "Chronoscape uses your location to provide contextual historical information about your current area."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#1a1a2e"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "package": "com.chronoscape.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Chronoscape geçmiş ve gelecek görüntülerini göstermek için kamera erişimine ihtiyaç duyar."
+        }
+      ]
+    ]
   }
 }
