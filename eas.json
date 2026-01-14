@@ -14,11 +14,17 @@
       "distribution": "internal",
       "ios": {
         "simulator": true
+      },
+      "android": {
+        "buildType": "apk"
       }
     },
     "production": {
       "ios": {
         "resourceClass": "default"
+      },
+      "android": {
+        "buildType": "apk"
       }
     }
   },

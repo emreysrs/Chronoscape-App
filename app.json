@@ -22,6 +22,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.chronoscape.app",
+      "appleTeamId": "G5GT3V3D86",
       "infoPlist": {
         "NSCameraUsageDescription": "Chronoscape needs camera access to show historical and future reconstructions.",
         "NSPhotoLibraryUsageDescription": "Chronoscape needs photo library access to analyze and transform your images.",

@@ -6,8 +6,9 @@ import {
   Dimensions,
   TouchableOpacity,
   ImageBackground,
-  SafeAreaView,
   PanResponder,
+  Animated,
+  Image,
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -20,61 +21,168 @@ interface AdvancedARViewProps {
 }
 
 const isfahanImage = require("../assets/siosepol.jpg");
+// Historic Isfahan photos for different eras
+const isfahanPastImage1603 = require("../assets/Safavid Era past 1603.png");
+const isfahanPastImage1950 = require("../assets/Pahlavi Era past Year 1950.png");
+const isfahanPresentImage2025 = require("../assets/Present era 2025.jpg");
+const isfahanFutureImage2100 = require("../assets/Future Era 2100 .png");
+const isfahanFutureImage2200 = require("../assets/ Future era 2200.png");
+// London photos for different eras
 const londonImage = require("../assets/london_tower.jpg");
+const londonPastImage1858 = require("../assets/london-1858.png");
+const londonPastImage1950 = require("../assets/london-1950.png");
+const londonPresentImage2025 = require("../assets/london-present.jpg");
+const londonFutureImage2150 = require("../assets/london-2150.png");
 
 export function AdvancedARView({ mode, onBack }: AdvancedARViewProps) {
   const [selectedCity, setSelectedCity] = useState<"Isfahan" | "London">("Isfahan");
-  const [currentYear, setCurrentYear] = useState(mode === "archaeological" ? 1858 : 2050);
   const [activeMode, setActiveMode] = useState<"archaeological" | "speculative">(mode);
   const [hideUI, setHideUI] = useState(false);
   const sliderRef = useRef<View>(null);
   const sliderWidth = useRef(width - 40);
-  const lastUpdateTime = useRef(0);
 
-  const minYear = activeMode === "archaeological" ? 1600 : 2026;
-  const maxYear = activeMode === "archaeological" ? 2025 : 2100;
 
-  const calculateYear = useCallback((locationX: number) => {
+  // Pan state for historic image exploration (no zoom, just pan)
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const lastPan = useRef({ x: 0, y: 0 });
+
+  // Image dimensions (landscape image: width = height * 1.5)
+  const imageWidth = height * 1.5;
+
+  // Calculate max pan (only horizontal since image fits vertically)
+  const maxPanX = Math.max(0, (imageWidth - width) / 2);
+
+  // PanResponder for historic image panning (horizontal only)
+  const imagePanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        lastPan.current = { ...panOffset };
+      },
+      onPanResponderMove: (_, gestureState) => {
+        // Horizontal pan only, clamped to prevent black borders
+        let newX = lastPan.current.x + gestureState.dx;
+        newX = Math.max(-maxPanX, Math.min(maxPanX, newX));
+        setPanOffset({ x: newX, y: 0 });
+      },
+      onPanResponderRelease: () => {
+        lastPan.current = { ...panOffset };
+      },
+    })
+  ).current;
+
+  // Reset pan when year changes
+  const resetImageTransform = () => {
+    setPanOffset({ x: 0, y: 0 });
+    lastPan.current = { x: 0, y: 0 };
+  };
+
+  // Define fixed year stops for each mode and city
+  const getYearStops = () => {
+    if (activeMode === "archaeological") {
+      return selectedCity === "Isfahan" ? [1603, 1950, 2025] : [1858, 1950, 2025];
+    } else {
+      // Speculative mode - different for each city
+      return selectedCity === "Isfahan" ? [2025, 2100, 2200] : [2025, 2150];
+    }
+  };
+  const yearStops = getYearStops();
+  const [currentYearIndex, setCurrentYearIndex] = useState(
+    mode === "archaeological" ? 1 : 1 // Start at middle option
+  );
+  const currentYear = yearStops[currentYearIndex];
+
+  const minYear = yearStops[0];
+  const maxYear = yearStops[yearStops.length - 1];
+
+  // Find closest year stop based on touch position
+  const findClosestYearIndex = useCallback((locationX: number) => {
     const percentage = Math.max(0, Math.min(1, locationX / sliderWidth.current));
-    return Math.round(minYear + percentage * (maxYear - minYear));
-  }, [minYear, maxYear]);
+    const exactYear = minYear + percentage * (maxYear - minYear);
+    
+    // Find the closest year stop
+    let closestIndex = 0;
+    let minDiff = Math.abs(yearStops[0] - exactYear);
+    
+    for (let i = 1; i < yearStops.length; i++) {
+      const diff = Math.abs(yearStops[i] - exactYear);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIndex = i;
+      }
+    }
+    
+    return closestIndex;
+  }, [yearStops, minYear, maxYear]);
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (e) => {
-        const year = calculateYear(e.nativeEvent.locationX);
-        setCurrentYear(year);
+        const index = findClosestYearIndex(e.nativeEvent.locationX);
+        setCurrentYearIndex(index);
       },
       onPanResponderMove: (e) => {
-        const now = Date.now();
-        // Throttle updates to every 16ms (60fps)
-        if (now - lastUpdateTime.current > 16) {
-          const year = calculateYear(e.nativeEvent.locationX);
-          setCurrentYear(year);
-          lastUpdateTime.current = now;
-        }
+        const index = findClosestYearIndex(e.nativeEvent.locationX);
+        setCurrentYearIndex(index);
       },
       onPanResponderRelease: (e) => {
-        const year = calculateYear(e.nativeEvent.locationX);
-        setCurrentYear(year);
+        const index = findClosestYearIndex(e.nativeEvent.locationX);
+        setCurrentYearIndex(index);
       },
     })
   ).current;
 
   const handleModeChange = (newMode: "archaeological" | "speculative") => {
     setActiveMode(newMode);
-    if (newMode === "archaeological") {
-      setCurrentYear(1858);
-    } else {
-      setCurrentYear(2050);
-    }
+    setCurrentYearIndex(1); // Reset to middle option
+    // Reset pan and zoom position when changing mode
+    resetImageTransform();
   };
 
   const getBackgroundImage = () => {
     return selectedCity === "Isfahan" ? isfahanImage : londonImage;
   };
+
+  // Choose which photo to show based on mode and year
+  const isIsfahanMode = selectedCity === "Isfahan";
+
+  // Select image based on year index
+  const getOverlayImage = () => {
+    if (selectedCity === "Isfahan") {
+      if (activeMode === "archaeological") {
+        // Archaeological: 0=1603, 1=1950, 2=2025
+        if (currentYearIndex === 0) return isfahanPastImage1603;
+        if (currentYearIndex === 1) return isfahanPastImage1950;
+        if (currentYearIndex === 2) return isfahanPresentImage2025;
+      } else {
+        // Speculative: 0=2025, 1=2100, 2=2200
+        if (currentYearIndex === 0) return isfahanPresentImage2025;
+        if (currentYearIndex === 1) return isfahanFutureImage2100;
+        if (currentYearIndex === 2) return isfahanFutureImage2200;
+      }
+    } else {
+      // London
+      if (activeMode === "archaeological") {
+        // Archaeological: 0=1858, 1=1950, 2=2025
+        if (currentYearIndex === 0) return londonPastImage1858;
+        if (currentYearIndex === 1) return londonPastImage1950;
+        if (currentYearIndex === 2) return londonPresentImage2025;
+      } else {
+        // Speculative: 0=2025, 1=2150
+        if (currentYearIndex === 0) return londonPresentImage2025;
+        if (currentYearIndex === 1) return londonFutureImage2150;
+      }
+    }
+    return null;
+  };
+  
+  const overlayImage = getOverlayImage();
+
+  // Show full opacity when any era image is selected
+  const overlayOpacity = overlayImage ? 1 : 0;
 
   const getLocationText = () => {
     return selectedCity === "Isfahan" 
@@ -92,15 +200,56 @@ export function AdvancedARView({ mode, onBack }: AdvancedARViewProps) {
         }
       }}
     >
-      <ImageBackground
-        source={getBackgroundImage()}
-        style={styles.container}
-        resizeMode="cover"
-      >
-        {/* Dark overlay for better readability */}
-        {!hideUI && <View style={styles.darkOverlay} />}
+      {/* Show background image only when not viewing era photo */}
+      {!(overlayOpacity > 0 && overlayImage) ? (
+        <ImageBackground
+          source={getBackgroundImage()}
+          style={styles.container}
+          resizeMode="cover"
+        >
+          {/* Dark overlay for better readability */}
+          {!hideUI && <View style={styles.darkOverlay} />}
+        </ImageBackground>
+      ) : (
+        <View style={[styles.container, { backgroundColor: '#000' }]} />
+      )}
+      
+      {/* Era overlay showing historic/future Isfahan photos */}
+      {overlayOpacity > 0 && overlayImage && (
+        <View 
+          style={[styles.pastOverlay, { opacity: 1, overflow: 'hidden', backgroundColor: '#000' }]}
+          {...imagePanResponder.panHandlers}
+        >
+          <View
+            style={{
+              width: imageWidth,
+              height: height,
+              alignItems: 'center',
+              justifyContent: 'center',
+              transform: [
+                { translateX: panOffset.x },
+              ],
+            }}
+          >
+            <Image
+              source={overlayImage}
+              style={{
+                height: height,
+                width: imageWidth,
+              }}
+              resizeMode="cover"
+            />
+          </View>
+          {/* Pan hint indicator */}
+          {hideUI === false && (
+            <View style={styles.panHintContainer}>
+              <Text style={styles.panHintText}>← Sola/Sağa Kaydır →</Text>
+            </View>
+          )}
+        </View>
+      )}
 
-        <SafeAreaView style={styles.safeArea}>
+        <View style={[styles.safeArea, { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }]}>
           {/* Top Location Bar */}
           {!hideUI && (
           <View style={styles.topBar}>
@@ -217,6 +366,17 @@ export function AdvancedARView({ mode, onBack }: AdvancedARViewProps) {
                   { width: `${((currentYear - minYear) / (maxYear - minYear)) * 100}%` },
                 ]}
               />
+              {/* Year stop markers */}
+              {yearStops.map((year, index) => (
+                <View
+                  key={year}
+                  style={[
+                    styles.yearStopMarker,
+                    { left: `${((year - minYear) / (maxYear - minYear)) * 100}%` },
+                    currentYearIndex === index && styles.yearStopMarkerActive,
+                  ]}
+                />
+              ))}
               {/* Slider thumb */}
               <View
                 style={[
@@ -226,14 +386,21 @@ export function AdvancedARView({ mode, onBack }: AdvancedARViewProps) {
               />
             </View>
 
-            {/* Year labels - only start and end years */}
+            {/* Year labels - show all stops */}
             <View style={styles.yearLabels}>
-              <Text style={[styles.yearLabel, styles.yearLabelActive]}>
-                {minYear}
-              </Text>
-              <Text style={styles.yearLabel}>
-                {maxYear}
-              </Text>
+              {yearStops.map((year, index) => (
+                <Text 
+                  key={year}
+                  style={[
+                    styles.yearLabel, 
+                    currentYearIndex === index && styles.yearLabelActive,
+                    index === 0 && { textAlign: 'left' },
+                    index === yearStops.length - 1 && { textAlign: 'right' },
+                  ]}
+                >
+                  {year}
+                </Text>
+              ))}
             </View>
           </View>
 
@@ -274,8 +441,7 @@ export function AdvancedARView({ mode, onBack }: AdvancedARViewProps) {
           </View>
         </View>
         )}
-      </SafeAreaView>
-    </ImageBackground>
+      </View>
     </TouchableOpacity>
   );
 }
@@ -288,6 +454,13 @@ const styles = StyleSheet.create({
   darkOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0, 0, 0, 0.3)",
+  },
+  pastOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  pastColorOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(90, 70, 40, 0.75)",
   },
   safeArea: {
     flex: 1,
@@ -519,6 +692,21 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: "#fff",
   },
+  yearStopMarker: {
+    position: "absolute",
+    top: 9,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    marginLeft: -6,
+    borderWidth: 2,
+    borderColor: "rgba(255, 255, 255, 0.4)",
+  },
+  yearStopMarkerActive: {
+    backgroundColor: "#D4A853",
+    borderColor: "#fff",
+  },
   yearLabels: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -529,6 +717,8 @@ const styles = StyleSheet.create({
     color: "rgba(255, 255, 255, 0.5)",
     fontSize: 12,
     fontWeight: "500",
+    flex: 1,
+    textAlign: "center",
   },
   yearLabelActive: {
     color: "#D4A853",
@@ -558,5 +748,20 @@ const styles = StyleSheet.create({
   },
   modeButtonTextActive: {
     color: "#000",
+  },
+  panHintContainer: {
+    position: "absolute",
+    bottom: "32%",
+    alignSelf: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  panHintText: {
+    color: "#D4A853",
+    fontSize: 12,
+    fontWeight: "600",
+    letterSpacing: 1,
   },
 });

@@ -5,11 +5,15 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
 
 const { width, height } = Dimensions.get("window");
+
+// Logo image
+const logoImage = require("../assets/Logo new.png");
 
 interface ModeSelectionScreenProps {
   onSelectMode: (mode: "archaeological" | "speculative") => void;
@@ -22,6 +26,15 @@ export function ModeSelectionScreen({ onSelectMode }: ModeSelectionScreenProps) 
         colors={["#1a1a2e", "#16213e", "#0f3460"]}
         style={styles.gradient}
       >
+        {/* Logo */}
+        <View style={styles.logoContainer}>
+          <Image
+            source={logoImage}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+
         <Text style={styles.title}>Select a mode to begin</Text>
         <Text style={styles.subtitle}>Choose how you want to explore time</Text>
 
@@ -91,6 +104,14 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: "center",
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  logo: {
+    width: width * 0.5,
+    height: 80,
   },
   title: {
     fontSize: 32,
