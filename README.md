@@ -1,123 +1,178 @@
-# Chronoscape - Zamanda Yolculuk AR Uygulaması
+<div align="center">
 
-Chronoscape, iOS için geliştirilmiş bir artırılmış gerçeklik (AR) uygulamasıdır. Kameranızı kullanarak geçmiş, şimdi ve gelecek arasında geçiş yaparak zamanı keşfedin.
+# 🕰️ Chronoscape
 
-## Özellikler
+**Travel Through Time with Augmented Reality**
 
-- ⏳ **Splash Screen**: Hoş bir açılış ekranı
-- 📱 **Onboarding**: Kullanıcı dostu tanıtım ekranları
-- 📸 **AR Kamera Görünümü**: Gerçek zamanlı kamera üzerine geçmiş ve gelecek görüntüleri
-- 🎨 **Smooth Animasyonlar**: React Native Reanimated ile akıcı geçişler
-- 🌐 **Zaman Modları**: Geçmiş, Şimdi ve Gelecek arasında geçiş
+Experience history and future like never before. Point your camera at iconic locations and watch them transform across centuries.
 
-## Kurulum
+[![React Native](https://img.shields.io/badge/React%20Native-0.76-blue?logo=react)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo-SDK%2052-black?logo=expo)](https://expo.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-API-412991?logo=openai)](https://openai.com/)
+[![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-lightgrey)](/)
 
-### Gereksinimler
+</div>
 
-- Node.js (v18 veya üzeri)
-- npm veya yarn
-- iOS için: Xcode ve macOS
-- Expo Go uygulaması (geliştirme için)
+---
 
-### Adımlar
+## 📱 Screenshots
 
-1. Bağımlılıkları yükleyin:
-```bash
-npm install
-```
+<div align="center">
+<table>
+  <tr>
+    <td align="center"><img src="screenshots/splash-screen.png" width="200" alt="Splash Screen"/><br/><b>Splash Screen</b></td>
+    <td align="center"><img src="screenshots/onboarding.png" width="200" alt="Onboarding"/><br/><b>Onboarding</b></td>
+    <td align="center"><img src="screenshots/mode-selection.png" width="200" alt="Mode Selection"/><br/><b>Mode Selection</b></td>
+    <td align="center"><img src="screenshots/ar-view.png" width="200" alt="AR Time Travel"/><br/><b>AR Time Travel</b></td>
+  </tr>
+</table>
+</div>
 
-2. iOS Simulator'de çalıştırın:
-```bash
-npm run ios
-```
+---
 
-3. Fiziksel cihazda test etmek için Expo Go kullanın:
-```bash
-npx expo start
-```
-Sonra Expo Go uygulamasıyla QR kodu tarayın.
+## ✨ Features
 
-## Kullanılan Teknolojiler
+### 🏛️ Archaeological Lens
+Travel back in time to explore historical reconstructions of famous locations.
 
-- **React Native**: Mobil uygulama framework'ü
-- **Expo**: Geliştirme ve deployment platformu
-- **React Native Reanimated**: Performanslı animasyonlar
-- **Expo Camera**: Kamera erişimi
-- **Expo Linear Gradient**: Gradient efektleri
-- **Expo Blur**: Blur efektleri
-- **TypeScript**: Tip güvenliği
+- **Time Range:** 1600 - Present
+- **Historical Records:** Access detailed information about each era
+- **Photo Archives:** View AI-generated historical imagery
+- **Detailed Maps:** Explore how locations evolved over centuries
 
-## Proje Yapısı
+### 🚀 Speculative Lens
+Imagine the future and see AI-powered predictions of how locations might evolve.
+
+- **Time Range:** Present - 2100
+- **Future Cities:** Visualize urban development
+- **AI Predictions:** Advanced scenario modeling
+- **Climate Impact:** See potential environmental changes
+
+### 📍 Supported Locations
+
+| Location | Country | Time Periods |
+|----------|---------|--------------|
+| **Si-o-se-pol Bridge** | Isfahan, Iran | 1600 - 2100 |
+| **Tower Bridge** | London, UK | 1600 - 2100 |
+
+*More locations coming soon!*
+
+---
+
+## 🛠️ Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| **Framework** | React Native with Expo SDK 52 |
+| **Language** | TypeScript |
+| **AI Integration** | OpenAI GPT-4 Vision & DALL-E 3 |
+| **Architecture** | New Architecture (Fabric) enabled |
+| **JS Engine** | Hermes |
+| **Styling** | React Native StyleSheet |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+- Xcode 15+ (for iOS)
+- Android Studio (for Android)
+- OpenAI API Key
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/emreysrs/Chronoscape-App.git
+   cd Chronoscape-App
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   ```
+   Add your OpenAI API key to the `.env` file:
+   ```
+   OPENAI_API_KEY=your_api_key_here
+   ```
+
+4. **Install iOS dependencies**
+   ```bash
+   cd ios && pod install && cd ..
+   ```
+
+5. **Run the app**
+   ```bash
+   # iOS
+   npm run ios
+   
+   # Android
+   npm run android
+   ```
+
+---
+
+## 📁 Project Structure
 
 ```
 ChronoscapeApp/
+├── App.tsx                 # Main application entry
 ├── components/
-│   ├── SplashScreen.tsx      # Açılış ekranı
-│   ├── OnboardingScreen.tsx  # Tanıtım ekranları
-│   └── MainARView.tsx        # Ana AR görünümü
-├── App.tsx                   # Ana uygulama bileşeni
-├── app.json                  # Expo konfigürasyonu
-├── babel.config.js           # Babel konfigürasyonu
-└── package.json              # Bağımlılıklar
-
+│   ├── AdvancedARView.tsx  # AR time travel view
+│   ├── ModeSelectionScreen.tsx
+│   ├── OnboardingScreen.tsx
+│   └── SplashScreen.tsx
+├── services/
+│   └── aiService.ts        # OpenAI API integration
+├── assets/                 # Images and historical photos
+├── ios/                    # Native iOS project
+├── android/                # Native Android project
+└── screenshots/            # App screenshots
 ```
 
-## Kullanım
+---
 
-1. Uygulama açıldığında splash screen görünür
-2. Onboarding ekranlarında uygulamanın nasıl kullanılacağı açıklanır
-3. Ana ekranda kamera açılır ve üç mod arasında geçiş yapabilirsiniz:
-   - 📜 **Geçmiş**: Tarihi görüntüler
-   - 📍 **Şimdi**: Normal kamera görünümü
-   - 🚀 **Gelecek**: Fütüristik görüntüler
+## 🔑 API Configuration
 
-## Kamera İzinleri
+Chronoscape uses OpenAI's API for:
 
-Uygulama iOS'ta kamera erişimi için izin ister. İzin verilmezse uygulama tam olarak çalışmaz. İzinleri Ayarlar > Gizlilik > Kamera'dan değiştirebilirsiniz.
+- **GPT-4 Vision:** Analyzes current images and generates historical/future descriptions
+- **DALL-E 3:** Creates AI-generated historical and futuristic imagery
 
-## Geliştirme
+To get an API key:
+1. Visit [OpenAI Platform](https://platform.openai.com/)
+2. Create an account and generate an API key
+3. Add it to your `.env` file
 
-### Debug Modu
-```bash
-npx expo start --dev-client
-```
+---
 
-### iOS Build
-```bash
-npx expo build:ios
-```
+## 📄 License
 
-veya EAS Build kullanarak:
-```bash
-npm install -g eas-cli
-eas login
-eas build --platform ios
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Sorun Giderme
+---
 
-### Kamera çalışmıyor
-- Kamera izinlerinin verildiğinden emin olun
-- Fiziksel cihazda test edin (simulator kamera desteği sınırlıdır)
+## 👨‍💻 Author
 
-### Animasyonlar yavaş
-- React Native Reanimated'in doğru kurulduğundan emin olun
-- Babel config'in güncel olduğunu kontrol edin
+**Emre Yesilyurt**
 
-### Build hataları
-```bash
-# Cache'i temizle
-npx expo start -c
+- GitHub: [@emreysrs](https://github.com/emreysrs)
 
-# Node modules'ü yeniden yükle
-rm -rf node_modules
-npm install
-```
+---
 
-## Lisans
+<div align="center">
 
-MIT
+**Built with ❤️ using React Native & OpenAI**
 
-## İletişim
+*Experience the past. Imagine the future.*
 
-Sorularınız için GitHub issues bölümünü kullanabilirsiniz.
+</div>
